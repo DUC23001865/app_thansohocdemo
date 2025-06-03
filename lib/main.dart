@@ -4,7 +4,7 @@ import 'screens/home_screen.dart';
 import 'screens/input_screen.dart';
 import 'screens/result_screen.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
 }
 

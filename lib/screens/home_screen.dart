@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'input_screen.dart';
 import 'about_screen.dart';
+import '../widgets/chatbot_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -80,8 +81,27 @@ class HomeScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const InputScreen(),
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  const InputScreen(),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            const begin =
+                                Offset(1.0, 0.0); // Bắt đầu từ bên phải
+                            const end = Offset.zero; // Kết thúc ở vị trí cũ
+                            const curve = Curves.ease; // Đường cong animation
+
+                            var tween = Tween(
+                              begin: begin,
+                              end: end,
+                            ).chain(CurveTween(curve: curve));
+
+                            return SlideTransition(
+                              position: animation.drive(tween),
+                              child: child,
+                            );
+                          },
                         ),
                       );
                     },
@@ -97,15 +117,53 @@ class HomeScreen extends StatelessWidget {
                       ),
                       elevation: 5,
                     ),
-                    child: Text(
+                    child: const Text(
                       'Bắt Đầu',
-                      style: GoogleFonts.quicksand(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
+                        color: Color(0xFF4A148C),
                       ),
                     ),
                   ),
                   const Spacer(),
+                  // Chatbot Button
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => Container(
+                            height: MediaQuery.of(context).size.height * 0.8,
+                            margin: const EdgeInsets.all(16),
+                            child: const ChatbotWidget(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.chat_bubble_outline),
+                      label: Text(
+                        'Hỏi đáp với AI',
+                        style: GoogleFonts.quicksand(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.purple.shade900,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                    ),
+                  ),
                   // Author Information
                   Padding(
                     padding: const EdgeInsets.only(bottom: 20),
