@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../widgets/trend_chart.dart';
 
 class AspectDetailsScreen extends StatelessWidget {
   final int lifePathNumber;
@@ -12,6 +13,57 @@ class AspectDetailsScreen extends StatelessWidget {
     required this.aspect,
     required this.title,
   });
+
+  List<double> getTrendData(int number, String aspect) {
+    final trends = {
+      'tinh_duyen': {
+        1: [7.0, 8.0, 6.5, 7.5, 8.5, 7.0, 8.0, 7.5, 8.5, 9.0],
+        2: [6.5, 7.0, 7.5, 8.0, 7.0, 7.5, 8.0, 8.5, 7.5, 8.0],
+        3: [8.0, 7.5, 8.5, 7.0, 8.0, 8.5, 7.5, 8.0, 8.5, 9.0],
+        4: [7.0, 7.5, 7.0, 8.0, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5],
+        5: [8.5, 7.0, 8.0, 7.5, 8.5, 7.0, 8.0, 7.5, 8.5, 9.0],
+        6: [7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5],
+        7: [7.0, 7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0],
+        8: [8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5, 9.0],
+        9: [7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5],
+      },
+      'huynh_de': {
+        1: [7.0, 7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0],
+        2: [8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5, 9.0],
+        3: [7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5],
+        4: [7.0, 7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0],
+        5: [8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5, 9.0],
+        6: [7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5],
+        7: [7.0, 7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0],
+        8: [8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5, 9.0],
+        9: [7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5],
+      },
+      'su_nghiep': {
+        1: [8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5, 9.0],
+        2: [7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5],
+        3: [7.0, 7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0],
+        4: [8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5, 9.0],
+        5: [7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5],
+        6: [7.0, 7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0],
+        7: [8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5, 9.0],
+        8: [7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5],
+        9: [7.0, 7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0],
+      },
+      'con_cai': {
+        1: [7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5],
+        2: [7.0, 7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0],
+        3: [8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5, 9.0],
+        4: [7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5],
+        5: [7.0, 7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0],
+        6: [8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5, 9.0],
+        7: [7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5],
+        8: [7.0, 7.5, 8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0],
+        9: [8.0, 7.0, 8.5, 7.5, 8.0, 8.5, 7.0, 8.0, 8.5, 9.0],
+      },
+    };
+
+    return trends[aspect]?[number] ?? List.generate(10, (index) => 7.0);
+  }
 
   String getAspectDetails(int number, String aspect) {
     final details = {
@@ -66,6 +118,10 @@ class AspectDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final years =
+        List.generate(10, (index) => '${DateTime.now().year - 9 + index}');
+    final trendData = getTrendData(lifePathNumber, aspect);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -87,30 +143,39 @@ class AspectDetailsScreen extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: Stack(
+          child: Column(
             children: [
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.purple.shade300,
-                        Colors.purple.shade900,
-                      ],
-                    ),
-                  ),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Text(
-                      getAspectDetails(lifePathNumber, aspect),
-                      style: GoogleFonts.quicksand(
-                        fontSize: 16,
-                        color: Colors.white,
-                        height: 1.5,
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        getAspectDetails(lifePathNumber, aspect),
+                        style: GoogleFonts.quicksand(
+                          fontSize: 16,
+                          color: Colors.white,
+                          height: 1.5,
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 30),
+                      Text(
+                        'Xu hướng 10 năm gần đây',
+                        style: GoogleFonts.quicksand(
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TrendChart(
+                        values: trendData,
+                        labels: years,
+                        title: 'Biểu đồ xu hướng',
+                        gradientColor: Colors.purple.shade300,
+                      ),
+                    ],
                   ),
                 ),
               ),
