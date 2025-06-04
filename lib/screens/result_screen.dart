@@ -7,6 +7,7 @@ import 'analysis_result_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:thansohoc/services/face_analysis_service.dart';
+import '../widgets/chatbot_button.dart';
 
 class ResultScreen extends StatefulWidget {
   final String name;
@@ -86,6 +87,7 @@ class _ResultScreenState extends State<ResultScreen> {
         setState(() {
           _imageFile = File(photo.path);
           _analysisResult = null;
+          _isAnalyzing = true;
         });
 
         print(
@@ -94,16 +96,14 @@ class _ResultScreenState extends State<ResultScreen> {
       }
     } catch (e) {
       _handleImageError(e);
+      setState(() {
+        _isAnalyzing = false;
+      });
     }
   }
 
   Future<void> _processImage() async {
     if (_imageFile == null) return;
-
-    setState(() {
-      _isAnalyzing = true;
-      _analysisResult = null;
-    });
 
     try {
       final analysisData = await analyzeFace(_imageFile!, widget.birthDate);
@@ -201,234 +201,312 @@ class _ResultScreenState extends State<ResultScreen> {
     final ageAdvice = getAgeAdvice(age);
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.purple.shade300,
-              Colors.purple.shade900,
-            ],
+      body: Stack(
+        children: [
+          // Background Gradient
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.purple.shade300,
+                  Colors.purple.shade900,
+                ],
+              ),
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+          SafeArea(
+            child: Stack(
               children: [
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Kết Quả Phân Tích',
-                        style: GoogleFonts.quicksand(
-                          fontSize: 20,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    SizedBox(width: 48), // Placeholder to keep alignment
-                  ],
-                ),
-                const SizedBox(height: 30),
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.purple.shade400.withOpacity(0.3),
-                        Colors.purple.shade800.withOpacity(0.3),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: Colors.white30),
-                  ),
+                SingleChildScrollView(
+                  padding: const EdgeInsets.all(20.0),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(
-                        'Họ và tên: ${widget.name}',
-                        style: GoogleFonts.quicksand(
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.arrow_back, color: Colors.white),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                          Expanded(
+                            child: Text(
+                              'Kết Quả Phân Tích',
+                              style: GoogleFonts.quicksand(
+                                fontSize: 20,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.white,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          SizedBox(width: 48), // Placeholder to keep alignment
+                        ],
                       ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Ngày sinh: ${widget.birthDate.day}/${widget.birthDate.month}/${widget.birthDate.year}',
-                        style: GoogleFonts.quicksand(
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Tuổi: $age',
-                        style: GoogleFonts.quicksand(
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Lời khuyên cho độ tuổi của bạn:',
-                        style: GoogleFonts.quicksand(
-                          fontSize: 16,
-                          color: Colors.white70,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        ageAdvice,
-                        style: GoogleFonts.quicksand(
-                          fontSize: 16,
-                          color: Colors.white,
-                          height: 1.5,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.purple.shade400.withOpacity(0.3),
-                        Colors.purple.shade800.withOpacity(0.3),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: Colors.white30),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Con số đường đời của bạn là:',
-                        style: GoogleFonts.quicksand(
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 30),
+                      // User Info and Age Advice
                       Container(
-                        width: 80,
-                        height: 80,
+                        padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              Colors.purple.shade400,
-                              Colors.purple.shade800,
+                              Colors.purple.shade400.withOpacity(0.3),
+                              Colors.purple.shade800.withOpacity(0.3),
                             ],
                           ),
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 10,
-                              spreadRadius: 2,
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(color: Colors.white30),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              'Họ và tên: ${widget.name}',
+                              style: GoogleFonts.quicksand(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Ngày sinh: ${widget.birthDate.day}/${widget.birthDate.month}/${widget.birthDate.year}',
+                              style: GoogleFonts.quicksand(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Tuổi: $age',
+                              style: GoogleFonts.quicksand(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              'Lời khuyên cho độ tuổi của bạn:',
+                              style: GoogleFonts.quicksand(
+                                fontSize: 16,
+                                color: Colors.white70,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              ageAdvice,
+                              style: GoogleFonts.quicksand(
+                                fontSize: 16,
+                                color: Colors.white,
+                                height: 1.5,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
                           ],
                         ),
-                        child: Center(
-                          child: Text(
-                            lifePathNumber.toString(),
-                            style: GoogleFonts.playfairDisplay(
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
+                      ),
+                      const SizedBox(height: 30),
+                      // Analysis Status or Result and Buttons
+                      if (_isAnalyzing)
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'AI đang phân tích...',
+                                style: GoogleFonts.quicksand(
+                                  fontSize: 18,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              const SizedBox(height: 20),
+                            ],
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        getLifePathMeaning(lifePathNumber),
-                        style: GoogleFonts.quicksand(
-                          fontSize: 16,
-                          color: Colors.white,
-                          height: 1.5,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DetailedMeaningScreen(
-                                lifePathNumber: lifePathNumber,
+                        )
+                      else
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Column(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Colors.purple.shade400.withOpacity(0.3),
+                                        Colors.purple.shade800.withOpacity(0.3),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(15),
+                                    border: Border.all(color: Colors.white30),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        'Con số đường đời của bạn là:',
+                                        style: GoogleFonts.quicksand(
+                                          fontSize: 18,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Container(
+                                        width: 80,
+                                        height: 80,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: [
+                                              Colors.purple.shade400,
+                                              Colors.purple.shade800,
+                                            ],
+                                          ),
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.black.withOpacity(0.2),
+                                              blurRadius: 10,
+                                              spreadRadius: 2,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            lifePathNumber.toString(),
+                                            style: GoogleFonts.playfairDisplay(
+                                              fontSize: 36,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      Text(
+                                        getLifePathMeaning(lifePathNumber),
+                                        style: GoogleFonts.quicksand(
+                                          fontSize: 16,
+                                          color: Colors.white,
+                                          height: 1.5,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            DetailedMeaningScreen(
+                                          lifePathNumber: lifePathNumber,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Colors.purple.shade900,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 30,
+                                      vertical: 15,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'Xem Chi Tiết',
+                                    style: GoogleFonts.quicksand(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: _takePicture,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.purple.shade900,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 30,
+                                  vertical: 15,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                              ),
+                              child: Text(
+                                'Phân tích khuôn mặt',
+                                style: GoogleFonts.quicksand(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.purple.shade900,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 30,
-                            vertical: 15,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
+                            if (_analysisResult != null)
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Colors.purple.shade400.withOpacity(0.3),
+                                      Colors.purple.shade800.withOpacity(0.3),
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color: Colors.white30),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      _analysisResult!,
+                                      style: GoogleFonts.quicksand(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                        height: 1.5,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
                         ),
-                        child: Text(
-                          'Xem Chi Tiết',
-                          style: GoogleFonts.quicksand(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: _takePicture,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.purple.shade900,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 30,
-                            vertical: 15,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                        ),
-                        child: Text(
-                          'Phân tích khuôn mặt',
-                          style: GoogleFonts.quicksand(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
                     ],
+                  ),
+                ),
+                // ChatbotButton positioned within the SafeArea's Stack
+                const Align(
+                  alignment: Alignment.bottomRight,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        right: 16.0, bottom: 16.0), // Adjust padding as needed
+                    child: ChatbotButton(),
                   ),
                 ),
               ],
             ),
           ),
-        ),
+        ],
       ),
     );
   }

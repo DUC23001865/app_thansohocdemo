@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'result_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/chatbot_button.dart';
 
 class InputScreen extends StatefulWidget {
   const InputScreen({super.key});
@@ -346,6 +347,7 @@ class _InputScreenState extends State<InputScreen> {
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
+              const ChatbotButton(),
             ],
           ),
         ),

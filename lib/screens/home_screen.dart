@@ -2,10 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'input_screen.dart';
 import 'about_screen.dart';
-import '../widgets/chatbot_widget.dart';
+import '../widgets/chatbot_button.dart';
+import '../widgets/chatbot_greeting_overlay.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool _showGreeting = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Hide the greeting after a few seconds
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _showGreeting = false;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +140,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     child: const Text(
                       'Bắt Đầu',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF4A148C),
@@ -127,43 +148,6 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  // Chatbot Button
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => Container(
-                            height: MediaQuery.of(context).size.height * 0.8,
-                            margin: const EdgeInsets.all(16),
-                            child: const ChatbotWidget(),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.chat_bubble_outline),
-                      label: Text(
-                        'Hỏi đáp với AI',
-                        style: GoogleFonts.quicksand(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.purple.shade900,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                    ),
-                  ),
                   // Author Information
                   Padding(
                     padding: const EdgeInsets.only(bottom: 20),
@@ -178,6 +162,10 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ],
               ),
+              // Chatbot Button
+              const ChatbotButton(),
+              // Chatbot Greeting Overlay
+              if (_showGreeting) const ChatbotGreetingOverlay(),
             ],
           ),
         ),
